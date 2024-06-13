@@ -1,0 +1,235 @@
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./services/api-gateway/Dockerfile
+      target: development
+    command: npm run start:dev api-gateway
+    env_file:
+      - ./services/api-gateway/.env
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+    networks:
+      - app-net
+    ports:
+      - '3000:3000'
+    volumes:
+      - C:/Projects/Pet-Project:/usr/src/app
+    depends_on:
+      - "kafka"
+      - "postgres"
+      - "auth"
+      - "books"
+      - "reviews"
+  auth:
+    build:
+      context: .
+      dockerfile: ./services/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./services/auth/.env
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+    networks:
+      - app-net
+    ports:
+      - '3001:3001'
+    volumes:
+      - C:/Projects/Pet-Project:/usr/src/app
+    depends_on:
+      - "kafka"
+      - "postgres"
+  books:
+    build:
+      context: .
+      dockerfile: ./services/books/Dockerfile
+      target: development
+    command: npm run start:dev books
+    env_file:
+      - ./services/books/.env
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+    networks:
+      - app-net
+    volumes:
+      - C:/Projects/Pet-Project:/usr/src/app
+    depends_on:
+      - "kafka"
+      - "postgres"
+      - "es01"
+      - "es02"
+      - "es03"
+      - "redis"
+  moderation:
+    build:
+      context: .
+      dockerfile: ./services/moderation/Dockerfile
+      target: development
+    command: npm run start:dev moderation
+    env_file:
+      - ./services/moderation/.env
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+    networks:
+      - app-net
+    volumes:
+      - C:/Projects/Pet-Project:/usr/src/app
+    depends_on:
+      - "kafka"
+  reviews:
+    build:
+      context: .
+      dockerfile: ./services/reviews/Dockerfile
+      target: development
+    command: npm run start:dev reviews
+    env_file:
+      - ./services/reviews/.env
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+    networks:
+      - app-net
+    volumes:
+      - C:/Projects/Pet-Project:/usr/src/app
+    depends_on:
+      - "kafka"
+      - "postgres"
+      - "auth"
+      - "books"
+      - "moderation"
+  postgres:
+    image: postgres:15
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    networks:
+      - app-net
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:29092"
+    networks:
+      - app-net
+    depends_on:
+      - "kafka"
+
+  kafka:
+    image: obsidiandynamics/kafka
+    restart: "no"
+    ports:
+      - "2181:2181"
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_LISTENERS: "INTERNAL://:29092,EXTERNAL://:9092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:29092,EXTERNAL://kafka:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT: "6000"
+      KAFKA_RESTART_ATTEMPTS: "10"
+      KAFKA_RESTART_DELAY: "5"
+      ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL: "0"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - app-net
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - app-net
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+    networks:
+      - app-net
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - app-net
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    mem_limit: 5096m
+    mem_reservation: 4096m
+    container_name: kibana
+    restart: always
+    environment:
+      ELASTICSEARCH_URL: "http://es01:9200"
+      ELASTICSEARCH_HOSTS: "http://es01:9200"
+      elasticsearch.ssl.verificationMode: none
+      LOGGING_VERBOSE: "false"
+    ports:
+      - 5601:5601
+    networks:
+      - app-net
+    depends_on:
+      - "es01"
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=1
+    networks:
+      - app-net
+
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+
+networks:
+  app-net:
+    driver: bridge

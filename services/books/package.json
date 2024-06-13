@@ -1,0 +1,21 @@
+{
+  "name": "@book-reviews-api/books",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.13.0",
+    "@nestjs-modules/ioredis": "^2.0.2",
+    "@nestjs/elasticsearch": "^10.0.1",
+    "@nestjs/schedule": "^4.0.2",
+    "@nestjs/typeorm": "^10.0.2"
+  }
+}

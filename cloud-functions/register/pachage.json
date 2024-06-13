@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "name": "register",
+  "version": "0.0.19",
+
+  "dependencies": {
+    "gcip-cloud-functions": "^0.2.0"
+  }
+}

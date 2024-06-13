@@ -1,0 +1,20 @@
+{
+  "name": "@book-reviews-api/moderation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.13.0",
+    "@nestjs/elasticsearch": "^10.0.1",
+    "@nestjs/schedule": "^4.0.2",
+    "nestjs-redis": "^1.3.3"
+  }
+}

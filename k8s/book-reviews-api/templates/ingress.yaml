@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: book-reviews-api
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api-gateway/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 3000
+          - path: /kibana/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: kibana
+                port:
+                  number: 5601
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: kafdrop
+                port:
+                  number: 9000
+

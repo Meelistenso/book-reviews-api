@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kafdrop
+  name: kafdrop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafdrop
+  template:
+    metadata:
+      labels:
+        app: kafdrop
+    spec:
+      containers:
+        - image: obsidiandynamics/kafdrop
+          name: kafdrop
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "25m"
+            limits:
+              memory: "1024Mi"
+              cpu: "50m"
+          env:
+            - name: KAFKA_BROKERCONNECT
+              value: kafka:29092
+          ports:
+            - containerPort: 9000

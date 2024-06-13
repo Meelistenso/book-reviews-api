@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "services/api-gateway/src",
+  "projects": {
+    "common": {
+      "type": "library",
+      "root": "libraries/common",
+      "entryFile": "index",
+      "sourceRoot": "libraries/common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libraries/common/tsconfig.library.json"
+      }
+    },
+    "repositories": {
+      "type": "library",
+      "root": "libraries/repositories",
+      "entryFile": "index",
+      "sourceRoot": "libraries/repositories/src",
+      "compilerOptions": {
+        "tsConfigPath": "libraries/repositories/tsconfig.library.json"
+      }
+    },
+    "api-gateway": {
+      "type": "application",
+      "root": "services/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "services/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/api-gateway/tsconfig.service.json"
+      }
+    },
+    "auth": {
+      "type": "application",
+      "root": "services/auth",
+      "entryFile": "main",
+      "sourceRoot": "services/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/auth/tsconfig.service.json"
+      }
+    },
+    "books": {
+      "type": "application",
+      "root": "services/books",
+      "entryFile": "main",
+      "sourceRoot": "services/books/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/books/tsconfig.service.json"
+      }
+    },
+    "reviews": {
+      "type": "application",
+      "root": "services/reviews",
+      "entryFile": "main",
+      "sourceRoot": "services/reviews/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/reviews/tsconfig.service.json"
+      }
+    },
+    "moderation": {
+      "type": "application",
+      "root": "services/moderation",
+      "entryFile": "main",
+      "sourceRoot": "services/moderation/src",
+      "compilerOptions": {
+        "tsConfigPath": "services/moderation/tsconfig.service.json"
+      }
+    }
+  },
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "services/api-gateway/tsconfig.service.json"
+  },
+  "monorepo": true,
+  "root": "services/api-gateway"
+}

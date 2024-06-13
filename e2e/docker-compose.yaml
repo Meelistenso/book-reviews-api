@@ -1,0 +1,38 @@
+services:
+  e2e:
+    build:
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./specs:/usr/src/app/specs
+    depends_on:
+      - api-gateway
+      - auth
+      - books
+      - reviews
+      - postgres
+  api-gateway:
+    image: us-east4-docker.pkg.dev/sleepr-378423/api-gateway/production
+    env_file:
+      - ../services/api-gateway/.env
+    ports:
+      - '3000:3000'
+  auth:
+    image: us-east4-docker.pkg.dev/sleepr-378423/auth/production
+    env_file:
+      - ../services/auth/.env
+    ports:
+      - '3001:3001'
+  payments:
+    image: us-east4-docker.pkg.dev/sleepr-378423/books/production
+    ports:
+      - '3003:3003'
+    env_file:
+      - ../services/books/.env
+  notifications:
+    image: us-east4-docker.pkg.dev/sleepr-378423/reviews/production
+    ports:
+      - '3004:3004'
+    env_file:
+      - ../services/reviews/.env
+  postgres:
+    image: postgres:15
